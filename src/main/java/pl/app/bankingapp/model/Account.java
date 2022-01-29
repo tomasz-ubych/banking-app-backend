@@ -1,10 +1,7 @@
 package pl.app.bankingapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -18,14 +15,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
+@ToString
 public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
     @Column
     private String iban;
+    @ManyToMany
     @JsonIgnore
-    @ManyToMany(cascade={CascadeType.ALL})
+    @JoinTable(
+            name="account_customer",
+            joinColumns = @JoinColumn(name="account_id"),
+            inverseJoinColumns = @JoinColumn(name="customer_id")
+    )
     private Set<Customer> customers = new HashSet<>();
     @Column
     private BigDecimal amount;
@@ -35,7 +38,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    public void addItem(Customer item) {
-        customers.add(item);
+    public void addCustomer(Customer customer) {
+        customers.add(customer);
     }
 }

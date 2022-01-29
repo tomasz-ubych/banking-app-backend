@@ -22,9 +22,14 @@ public class Customer {
     private String lastName;
     @Column
     private String pesel;
-    @JsonIgnore
+
     @ManyToMany(mappedBy = "customers")
+    @JsonIgnore
     private Set<Account> accounts = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy="customer")
+    private Set<Address> addresses = new HashSet<>();
 
 }
 

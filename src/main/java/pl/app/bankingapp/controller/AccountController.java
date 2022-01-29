@@ -11,12 +11,6 @@ import pl.app.bankingapp.model.Customer;
 import pl.app.bankingapp.repository.AccountRepository;
 import pl.app.bankingapp.repository.AddressRepository;
 import pl.app.bankingapp.repository.CustomerRepository;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
 @CrossOrigin
 @RestController
 public class AccountController {
@@ -35,22 +29,15 @@ public class AccountController {
     }
 
     @PostMapping("/account")
-    public Account createAccount(@RequestParam Long customerId,
-                                  @RequestBody Account account) {
-        Optional<Customer> customers = customerRepository.findById(customerId);
-        Set<Account> accounts = new HashSet<>();
-        accounts.add(account);
-        customers.map(customer -> {
-            customer.setAccounts(new HashSet<Account>(accounts));
-            account.addItem(customer);
-            accountRepository.save(account);
-            customerRepository.save(customer);
-            return account;
-        }).orElseThrow(() -> new ResourceNotFoundException("CustomerId " + customerId + " not found"));
-        return account;
+    public Account createAccount(@RequestBody Account account) {
+        return accountRepository.save(account);
     }
 
-
-
-
+    @PutMapping("/account")
+    public Account assignCustomerToAccount(@RequestParam(required = false) Long accountId, @RequestParam(required = false) Long customerId){
+        Customer customer = customerRepository.findById(customerId).get();
+        Account account = accountRepository.findById(accountId).get();
+        account.addCustomer(customer);
+        return accountRepository.save(account);
+    }
 }
